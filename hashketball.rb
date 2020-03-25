@@ -179,9 +179,48 @@ def big_shoe_rebounds
     .fetch(:rebounds)
 end
 
+def most_points_scored
+  all_player_stats
+    .max_by {|player| player[:points]}
+    .fetch(:player_name)
+end
 
+def winning_team
+  game_scores.reduce(nil) do |memo, (key, team)|
+    memo = memo || team
+    
+    memo = memo[:score] > team[:score] ? memo : team
+    memo
+  end
+    .fetch(:team_name)
+end
 
+def game_scores
+  game_hash.reduce({}) do |memo, (key, team)|
+    memo[key] = {
+      team_name: team[:team_name],
+      score: total_points(team[:players])
+    }
+    memo
+  end
+end
 
+def total_points(players)
+  players.reduce(0) {|memo, player| memo += player[:points]}
+end
 
+def player_with_longest_name
+  all_player_stats
+    .max_by {|player| player[:player_name].length}
+    .fetch(:player_name)
+end
 
+def most_steals
+  all_player_stats
+    .max_by {|player| player[:steals]}
+    .fetch(:player_name)
+end
 
+def long_name_steals_a_ton?
+  most_steals === player_with_longest_name
+end
